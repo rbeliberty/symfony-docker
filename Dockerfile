@@ -7,7 +7,7 @@
 ARG PHP_VERSION=7.4
 ARG NGINX_VERSION=1.17
 
-# "php" stage
+############################################################################################################ "php" stage
 FROM php:${PHP_VERSION}-fpm-alpine AS symfony_php
 
 # persistent / runtime deps
@@ -111,7 +111,7 @@ ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
 
 
-# "nginx" stage
+########################################################################################################## "nginx" stage
 # depends on the "php" stage above
 FROM nginx:${NGINX_VERSION}-alpine AS symfony_nginx
 
@@ -121,7 +121,7 @@ WORKDIR /srv/app
 
 COPY --from=symfony_php /srv/app/public public/
 
-# "h2-proxy-cert" stage
+################################################################################################## "h2-proxy-cert" stage
 FROM alpine:latest AS symfony_h2-proxy-cert
 
 RUN apk add --no-cache openssl
@@ -134,7 +134,7 @@ RUN openssl req -new -passout pass:NotSecure -key server.key -out server.csr \
 	-subj '/C=SS/ST=SS/L=Gotham City/O=Symfony/CN=localhost'
 RUN openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out server.crt
 
-### "h2-proxy" stage
+####################################################################################################### "h2-proxy" stage
 FROM nginx:${NGINX_VERSION}-alpine AS symfony_h2-proxy
 
 RUN mkdir -p /etc/nginx/ssl/
